@@ -7,30 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="card">
-    <section id="intro" class="screen active">
-      <div class="emoji-big">🕵️</div>
-      <h1>How Well Do You Know Me?</h1>
-      <p class="sub">6 questions about your instructor. Be honest, no cheating (we'll know).</p>
-      <button id="start" class="btn">Let's find out!</button>
-    </section>
-
-    <section id="quiz" class="screen">
-      <div class="progress"><div id="bar"></div></div>
-      <p id="count" class="count"></p>
-      <h2 id="question"></h2>
-      <div id="answers" class="answers"></div>
-    </section>
-
-    <section id="result" class="screen">
-      <p class="count">Your score</p>
-      <p id="r-score" class="score"></p>
-      <div id="r-emoji" class="emoji-big"></div>
-      <h1 id="r-title"></h1>
-      <p id="r-desc" class="sub"></p>
-      <button id="restart" class="btn">Take it again</button>
-    </section>
-  </main>
+  <main class="card" id="app" aria-live="polite"></main>
   <script src="script.js"></script>
 </body>
 </html>

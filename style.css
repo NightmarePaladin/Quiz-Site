@@ -94,3 +94,6 @@ h2 { font-size: clamp(1.3rem, 4.5vw, 1.7rem); margin: 8px 0 22px; line-height: 1
   font-weight: bold;
   margin: 4px 0 8px;
 }
+
+.answer:disabled { cursor: default; transform: none; box-shadow: 4px 4px 0 #1d1d3b; }
+.answer:disabled:not(.right):not(.wrong) { opacity: .55; }

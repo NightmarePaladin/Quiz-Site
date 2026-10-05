@@ -66,70 +66,117 @@ const ranks = [
   { min: 0, emoji: "🕵️", title: "Total Stranger", desc: "Zero or one?! We have basically never met. Let's grab a pumpkin spice latte." }
 ];
 
-const $ = (id) => document.getElementById(id);
-const screens = ["intro", "quiz", "result"];
-let current = 0;
-let score = 0;
-let locked = false;
+// ---- Single Page App: hash router + view functions ----
+// Routes:  #/            intro
+//          #/question/N  question N (1-based)
+//          #/result      final score
 
-function show(name) {
-  screens.forEach((s) => $(s).classList.toggle("active", s === name));
+const app = document.getElementById("app");
+const ADVANCE_MS = 900;
+
+let picks = []; // picks[i] = index of the answer chosen for question i
+let timer = null;
+
+const score = () => picks.filter((p, i) => questions[i].answers[p].correct).length;
+
+function go(hash) {
+  if (location.hash === hash) render();
+  else location.hash = hash;
 }
 
-function start() {
-  current = 0;
-  score = 0;
-  show("quiz");
-  renderQuestion();
+function render() {
+  clearTimeout(timer);
+  const [, route = "", arg] = location.hash.slice(1).split("/");
+
+  if (route === "question") {
+    const n = parseInt(arg, 10);
+    if (!(n >= 1 && n <= questions.length)) return go("#/");
+    // Can't skip ahead: send them to the first unanswered question.
+    if (n - 1 > picks.length) return go(`#/question/${picks.length + 1}`);
+    return showQuestion(n - 1);
+  }
+  if (route === "result") {
+    if (picks.length < questions.length) return go(`#/question/${Math.min(picks.length + 1, questions.length)}`);
+    return showResult();
+  }
+  if (route === "") return showIntro();
+  go("#/"); // unknown route
 }
 
-function renderQuestion() {
-  locked = false;
-  const item = questions[current];
-  $("count").textContent = `Question ${current + 1} of ${questions.length}`;
-  $("bar").style.width = `${(current / questions.length) * 100}%`;
-  $("question").textContent = item.q;
-  $("answers").innerHTML = "";
-  item.answers.forEach((a) => {
+function mount(title, html) {
+  document.title = title;
+  app.innerHTML = `<section class="screen active">${html}</section>`;
+  window.scrollTo(0, 0);
+}
+
+function showIntro() {
+  mount("How Well Do You Know Me?", `
+    <div class="emoji-big">🕵️</div>
+    <h1>How Well Do You Know Me?</h1>
+    <p class="sub">${questions.length} questions about your instructor. Be honest, no cheating (we'll know).</p>
+    <button id="start" class="btn">Let's find out!</button>`);
+  document.getElementById("start").addEventListener("click", () => {
+    picks = [];
+    go("#/question/1");
+  });
+}
+
+function showQuestion(i) {
+  const item = questions[i];
+  const answered = picks[i] !== undefined;
+  mount(`Question ${i + 1} - Quiz`, `
+    <div class="progress"><div id="bar" style="width:${(i / questions.length) * 100}%"></div></div>
+    <p class="count">Question ${i + 1} of ${questions.length}</p>
+    <h2></h2>
+    <div id="answers" class="answers"></div>`);
+  app.querySelector("h2").textContent = item.q;
+
+  const box = document.getElementById("answers");
+  item.answers.forEach((a, idx) => {
     const btn = document.createElement("button");
     btn.className = "answer";
     btn.textContent = a.text;
-    btn.addEventListener("click", () => choose(a, btn));
-    $("answers").appendChild(btn);
+    btn.addEventListener("click", () => choose(i, idx));
+    box.appendChild(btn);
   });
+
+  if (answered) reveal(i); // came back via the Back button
 }
 
-function choose(answer, btn) {
-  if (locked) return;
-  locked = true;
-  if (answer.correct) score++;
-
-  // Flash the result: the picked button goes green/red, and the right one is revealed.
-  const buttons = [...$("answers").children];
-  questions[current].answers.forEach((a, i) => {
-    if (a.correct) buttons[i].classList.add("right");
+function reveal(i) {
+  const buttons = [...document.getElementById("answers").children];
+  questions[i].answers.forEach((a, idx) => {
+    if (a.correct) buttons[idx].classList.add("right");
   });
-  if (!answer.correct) btn.classList.add("wrong");
+  const picked = picks[i];
+  if (!questions[i].answers[picked].correct) buttons[picked].classList.add("wrong");
+  buttons.forEach((b) => (b.disabled = true));
+}
 
-  setTimeout(() => {
-    current++;
-    if (current < questions.length) {
-      renderQuestion();
-    } else {
-      showResult();
-    }
-  }, 900);
+function choose(i, idx) {
+  if (picks[i] !== undefined) return;
+  picks[i] = idx;
+  reveal(i);
+  timer = setTimeout(() => {
+    go(i + 1 < questions.length ? `#/question/${i + 2}` : "#/result");
+  }, ADVANCE_MS);
 }
 
 function showResult() {
-  $("bar").style.width = "100%";
-  const r = ranks.find((x) => score >= x.min);
-  $("r-score").textContent = `${score} / ${questions.length}`;
-  $("r-emoji").textContent = r.emoji;
-  $("r-title").textContent = r.title;
-  $("r-desc").textContent = r.desc;
-  show("result");
+  const total = score();
+  const r = ranks.find((x) => total >= x.min);
+  mount(`${r.title} - Quiz`, `
+    <p class="count">Your score</p>
+    <p class="score">${total} / ${questions.length}</p>
+    <div class="emoji-big">${r.emoji}</div>
+    <h1>${r.title}</h1>
+    <p class="sub">${r.desc}</p>
+    <button id="restart" class="btn">Take it again</button>`);
+  document.getElementById("restart").addEventListener("click", () => {
+    picks = [];
+    go("#/");
+  });
 }
 
-$("start").addEventListener("click", start);
-$("restart").addEventListener("click", () => show("intro"));
+window.addEventListener("hashchange", render);
+render();
