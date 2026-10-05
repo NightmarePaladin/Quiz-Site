@@ -97,3 +97,12 @@ h2 { font-size: clamp(1.3rem, 4.5vw, 1.7rem); margin: 8px 0 22px; line-height: 1
 
 .answer:disabled { cursor: default; transform: none; box-shadow: 4px 4px 0 #1d1d3b; }
 .answer:disabled:not(.right):not(.wrong) { opacity: .55; }
+
+.note {
+  margin: 18px 0 0;
+  padding: 10px 14px;
+  background: #fff7cc;
+  border: 3px dashed #1d1d3b;
+  border-radius: 12px;
+  font-weight: bold;
+}

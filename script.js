@@ -6,27 +6,27 @@ const questions = [
     q: "What's my go-to comfort meal?",
     answers: [
       { text: "Tacos. Every day is Taco Tuesday.", correct: true },
-      { text: "A single sad salad", correct: false },
-      { text: "Cereal. For dinner. Every night.", correct: false },
-      { text: "Whatever's in a gas station", correct: false }
+      { text: "Pizza", correct: false },
+      { text: "Cereal for dinner", correct: false },
+      { text: "Gas station sushi", correct: false }
     ]
   },
   {
     q: "What's my drink order?",
     answers: [
       { text: "Pumpkin Spice Latte", correct: true },
-      { text: "Hot water with a lemon. Just vibes.", correct: false },
-      { text: "Chocolate milk, I'm 8 at heart", correct: false },
-      { text: "Whatever's the weirdest thing on the menu", correct: false }
+      { text: "Iced vanilla latte", correct: false },
+      { text: "Caramel macchiato", correct: false },
+      { text: "Chai latte", correct: false }
     ]
   },
   {
     q: "What am I most likely doing on a free weekend?",
     answers: [
       { text: "Dancing like nobody is watching", correct: true },
-      { text: "Hiking up a mountain at sunrise", correct: false },
-      { text: "Competitive knitting", correct: false },
-      { text: "Reorganizing my sock drawer by color", correct: false }
+      { text: "Binge-watching shows", correct: false },
+      { text: "Going to the gym", correct: false },
+      { text: "Playing video games", correct: false }
     ]
   },
   {
@@ -40,20 +40,21 @@ const questions = [
   },
   {
     q: "Which of these have I actually done?",
+    note: "Plot twist: I'm terrified of the ocean. 🌊",
     answers: [
-      { text: "Scuba diving (yes, I'm also afraid of the ocean)", correct: true },
-      { text: "Skydiving out of a plane", correct: false },
+      { text: "Scuba diving", correct: true },
+      { text: "Won a hot dog eating contest", correct: false },
       { text: "Wrestled an alligator", correct: false },
-      { text: "Run a marathon in flip-flops", correct: false }
+      { text: "Performed stand-up on a cruise ship", correct: false }
     ]
   },
   {
     q: "What's my guilty-pleasure watch?",
     answers: [
       { text: "Reality TV, no shame", correct: true },
-      { text: "Documentaries about moss", correct: false },
-      { text: "Watching paint dry in 4K", correct: false },
-      { text: "Silent black-and-white films", correct: false }
+      { text: "True crime documentaries", correct: false },
+      { text: "Superhero movies", correct: false },
+      { text: "Cooking competition shows", correct: false }
     ]
   }
 ];
@@ -151,6 +152,12 @@ function reveal(i) {
   const picked = picks[i];
   if (!questions[i].answers[picked].correct) buttons[picked].classList.add("wrong");
   buttons.forEach((b) => (b.disabled = true));
+  if (questions[i].note) {
+    const p = document.createElement("p");
+    p.className = "note";
+    p.textContent = questions[i].note;
+    document.getElementById("answers").after(p);
+  }
 }
 
 function choose(i, idx) {
