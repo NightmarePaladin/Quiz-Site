@@ -26,7 +26,7 @@ const questions = [
       { text: "Dancing like nobody is watching", correct: true },
       { text: "Binge-watching shows", correct: false },
       { text: "Going to the gym", correct: false },
-      { text: "Playing video games", correct: false }
+      { text: "Playing video games", correct: true }
     ]
   },
   {
@@ -114,7 +114,7 @@ function showIntro() {
   mount("How Well Do You Know Me?", `
     <div class="emoji-big">🕵️</div>
     <h1>How Well Do You Know Me?</h1>
-    <p class="sub">${questions.length} questions about your instructor. Be honest, no cheating (we'll know).</p>
+    <p class="sub">${questions.length} questions me. Be honest, no cheating (we'll know).</p>
     <button id="start" class="btn">Let's find out!</button>`);
   document.getElementById("start").addEventListener("click", () => {
     picks = [];
